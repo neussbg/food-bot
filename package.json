@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "start": "nodemon main.js",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.66.0",
+    "prettier": "^3.3.3",
+    "sequelize": "^6.37.5",
+    "sqlite3": "^5.1.7"
+  }
+}
