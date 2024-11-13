@@ -1,75 +1,78 @@
-const { User, Order } = require('../db'); // Подключаем модель пользователя
+const { sequelize, User, Order } = require('../db');
 
-async function login(bot, msg) {
-  const chatId = msg.chat.id;
-  const { id, first_name } = msg.from;
+async function login(bot, callbackQuery) {
+  const chatId = callbackQuery.message.chat.id;
+  const { id, first_name } = callbackQuery.from;
+  const data = callbackQuery.data;
 
-  const seller = 'Хочу отправлять заказы';
-  const customer = 'Хочу получать заказы';
+  const seller = 'send_orders';
+  const customer = 'receive_orders';
 
-  // Функция всегда должна возвращать Promise<boolean>
   try {
     const user = await User.findOne({
       where: { chatId: chatId.toString(), id: Number(id) },
     });
 
-    if (msg.text === seller) {
-      // Ищем пользователя в базе данных по chatId и id
-
+    if (data === seller) {
       if (user && user.role !== 'seller') {
         bot.sendMessage(
           chatId,
-          `${first_name} - Похоже вы уже зарегестрировались раньше, как получатель заказа`
+          `${first_name} - Похоже вы уже зарегистрировались как получатель заказа`
         );
-
         return false;
       }
 
       if (user) {
-        bot.sendMessage(chatId, `Добро пожаловать ${first_name}!`);
-
-        return true;
+        return new Promise((resolve) => {
+          bot.sendMessage(chatId, `Добро пожаловать ${first_name}!`);
+          setTimeout(() => resolve(true), 200);
+        });
       } else {
         bot.sendMessage(
           chatId,
-          `${first_name}, вы еще не зарегистрированы в системе, сейчас мы это исправим!`
+          `${first_name}, вы еще не зарегистрированы, сейчас мы это исправим!`
         );
 
         // Создаем нового пользователя в базе данных
-        await User.create({
+        return await User.create({
           chatId: chatId,
           id: Number(id),
+          name: first_name,
           role: 'seller',
-        });
-
-        // Отправляем успешное сообщение после регистрации
-        setTimeout(() => {
-          bot.sendMessage(
-            chatId,
-            `Регистрация прошла успешно ${first_name}, теперь вы являетесь поставщиком`
-          );
-        }, 2000);
-
-        // Возвращаем успешный результат
-        return true;
+        })
+          .then(() => {
+            return new Promise((resolve) => {
+              setTimeout(() => {
+                bot.sendMessage(
+                  chatId,
+                  `Регистрация прошла успешно, ${first_name}. Теперь вы являетесь поставщиком`
+                );
+                resolve(true);
+              }, 2000);
+            });
+          })
+          .catch((error) => {
+            console.error('Ошибка создания пользователя:', error);
+            return false;
+          });
       }
     }
 
-    if (msg.text === customer) {
+    if (data === customer) {
       if (user && user.role !== 'customer') {
         bot.sendMessage(
           chatId,
-          `${first_name} - Похоже вы уже зарегестрировались раньше, как отправитель заказа`
+          `${first_name} - Похоже вы уже зарегистрировались как отправитель заказа`
         );
-
         return false;
       }
     }
   } catch (error) {
     console.error('Ошибка при регистрации или авторизации:', error);
-
-    // Возвращаем false в случае ошибки
     return false;
+  } finally {
+    // Подтверждаем получение callback, чтобы убрать "часики" на кнопке
+    bot.answerCallbackQuery(callbackQuery.id);
   }
 }
 

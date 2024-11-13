@@ -12,6 +12,10 @@ const User = sequelize.define('User', {
     allowNull: false,
     unique: true,
   },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true, // Указание, что это первичный ключ
@@ -19,6 +23,35 @@ const User = sequelize.define('User', {
   },
   role: {
     type: DataTypes.ENUM('customer', 'seller'),
+    allowNull: false,
+  },
+});
+
+// Модель Поставщика
+const Supplier = sequelize.define('Supplier', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+});
+
+// Модель доставок
+const Delivery = sequelize.define('Delivery', {
+  position: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  supplierId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: User,
+      key: 'id',
+    },
     allowNull: false,
   },
 });
@@ -36,10 +69,24 @@ const Order = sequelize.define('Order', {
 });
 
 // Связь между пользователями и заказами
-User.hasMany(Order);
-Order.belongsTo(User);
+
+// User.hasMany(Order)
+// Order.belongsTo(User)
+// User.hasMany(Order);
+// Order.belongsTo(User);
+User.hasMany(Delivery);
+Delivery.belongsTo(User);
 
 // Синхронизируем модели с базой данных
-sequelize.sync();
 
-module.exports = { sequelize, User, Order };
+sequelize.sync();
+// sequelize
+//   .sync({ force: true })
+//   .then(() => {
+//     console.log('Таблицы синхронизированы');
+//   })
+//   .catch((error) => {
+//     console.error('Ошибка при синхронизации таблиц:', error);
+//   });
+
+module.exports = { sequelize, User, Order, Delivery, Supplier };

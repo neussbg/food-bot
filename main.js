@@ -6,6 +6,4 @@ const bot = new TelegramBot(token, { polling: true });
 
 const { initStartCommand } = require('./commands/start');
 
-// Инициализируем команды
 initStartCommand(bot);
-// initMenuCommands(bot);

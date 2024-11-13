@@ -2,9 +2,9 @@ const { showStartMenu } = require('./menu');
 
 // Инициализация команды /start
 module.exports.initStartCommand = (bot) => {
-  bot.onText(/\/start/, (msg) => {
+  bot.onText(/\/start/, async (msg) => {
     const chatId = msg.chat.id;
 
-    showStartMenu(bot, chatId);
+    await showStartMenu(bot, chatId);
   });
 };
