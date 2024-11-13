@@ -2,11 +2,20 @@ function sellerKeyboard() {
   const menuOptions = {
     reply_markup: {
       inline_keyboard: [
+        [{ text: 'Управление доставками', callback_data: 'manage_delivery' }],
         [
-          { text: 'Управление доставками', callback_data: 'manage_delivery' },
-          { text: 'Выбрать существующую', callback_data: 'select_delivery' },
+          {
+            text: 'Выбрать определенную доставку',
+            callback_data: 'select_delivery',
+          },
         ],
-        [{ text: 'Вернуться назад', callback_data: 'back_to_start' }],
+        [
+          {
+            text: 'Изменить поставщика на получателя',
+            callback_data: 'change_role',
+          },
+        ],
+        [{ text: 'Назад', callback_data: 'back_to_start' }],
       ],
     },
   };
@@ -18,14 +27,10 @@ function sellerManageKeyboard() {
   const menuOptions = {
     reply_markup: {
       inline_keyboard: [
-        [
-          { text: 'Добавить новую доставку', callback_data: 'add_delivery' },
-          { text: 'Обновить доставку', callback_data: 'update_delivery' },
-        ],
-        [
-          { text: 'Удалить доставку', callback_data: 'delete_delivery' },
-          { text: 'Назад', callback_data: 'back_to_main_delivery' },
-        ],
+        [{ text: 'Добавить новую доставку', callback_data: 'add_delivery' }],
+        [{ text: 'Обновить доставку', callback_data: 'update_delivery' }],
+        [{ text: 'Удалить доставку', callback_data: 'delete_delivery' }],
+        [{ text: 'Назад', callback_data: 'back_to_main_delivery' }],
       ],
     },
   };
@@ -45,16 +50,29 @@ function backKeyboard() {
   return menuOptions;
 }
 
+function startMenu() {
+  const menuOptions = {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: 'Хочу получать заказы', callback_data: 'receive_orders' }],
+        [{ text: 'Хочу отправлять заказы', callback_data: 'send_orders' }],
+      ],
+    },
+  };
+
+  return menuOptions;
+}
+
 // Функция для создания клавиатуры с позициями доставки
-function createKeyboard(positions, callback) {
+function createKeyboard(deliveryNames, callback, elementsInLine = 1) {
   const keyboard = [];
 
-  while (positions.length) {
-    const row = positions.splice(0, 3);
+  while (deliveryNames.length) {
+    const row = deliveryNames.splice(0, elementsInLine);
     keyboard.push(
       row.map((delivery) => ({
-        text: String(delivery.position),
-        callback_data: `${callback}_${delivery.position}`,
+        text: String(delivery.deliveryName),
+        callback_data: `${callback}_${delivery.deliveryName}`,
       }))
     );
   }
@@ -67,4 +85,5 @@ module.exports = {
   sellerManageKeyboard,
   backKeyboard,
   createKeyboard,
+  startMenu,
 };

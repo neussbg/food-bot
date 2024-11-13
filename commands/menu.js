@@ -1,4 +1,5 @@
 const { login } = require('../auth/auth');
+const { u, updateUserRole } = require('../logic/crud-user');
 const { Delivery } = require('../db');
 
 const {
@@ -6,6 +7,7 @@ const {
   sellerManageKeyboard,
   backKeyboard,
   createKeyboard,
+  startMenu,
 } = require('./menu-keyboard');
 
 const {
@@ -14,13 +16,19 @@ const {
 } = require('../logic/crud-delivery');
 
 const showDeliveryMenu = (bot, chatId) => {
-  bot.sendMessage(chatId, 'Выберите действие:', sellerKeyboard());
+  bot.sendMessage(
+    chatId,
+    'Выберите действие для поставщика:',
+    sellerKeyboard()
+  );
 
   bot.removeAllListeners('callback_query');
   bot.on('callback_query', async (callbackQuery) => {
     if (callbackQuery.data === 'manage_delivery') {
       showManageDeliveryMenu(bot, chatId); // Переход к следующему меню
-    } else if (callbackQuery.data === 'select_delivery') {
+    }
+
+    if (callbackQuery.data === 'select_delivery') {
       const deliveries = await handleGetAllDelivery();
 
       if (!deliveries || !deliveries.length) {
@@ -28,9 +36,25 @@ const showDeliveryMenu = (bot, chatId) => {
       } else {
         setDynamicMenu(bot, chatId, deliveries);
       }
-    } else if (callbackQuery.data === 'back_to_start') {
+    }
+
+    if (callbackQuery.data === 'change_role') {
+      await updateUserRole(bot, callbackQuery, 'customer');
+
+      const { first_name } = callbackQuery.from;
+
+      await bot.sendMessage(
+        chatId,
+        `${first_name}, ваша роль успешно измененна на получателя`
+      );
+
       await showStartMenu(bot, chatId);
     }
+
+    if (callbackQuery.data === 'back_to_start') {
+      await showStartMenu(bot, chatId);
+    }
+
     bot.answerCallbackQuery(callbackQuery.id);
   });
 };
@@ -91,16 +115,7 @@ const deliveryManagmnent = () => {};
 
 // Главное меню (выбор роли)
 async function showStartMenu(bot, chatId) {
-  const menuOptions = {
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: 'Хочу получать заказы', callback_data: 'receive_orders' }],
-        [{ text: 'Хочу отправлять заказы', callback_data: 'send_orders' }],
-      ],
-    },
-  };
-
-  bot.sendMessage(chatId, 'Выберите действие:', menuOptions);
+  bot.sendMessage(chatId, 'Выберите действие:', startMenu());
 
   bot.removeAllListeners('callback_query');
   bot.on('callback_query', async (callbackQuery) => {
@@ -111,7 +126,7 @@ async function showStartMenu(bot, chatId) {
 // Динамическое меню для списка доставок
 function setDynamicMenu(bot, chatId, items) {
   const values = [...items];
-  values.push({ position: 'Вернуться назад' });
+  values.push({ deliveryName: 'Назад' });
 
   const menuOptions = {
     reply_markup: {
@@ -123,61 +138,44 @@ function setDynamicMenu(bot, chatId, items) {
 
   bot.removeAllListeners('callback_query');
   bot.on('callback_query', async (callbackQuery) => {
-    await handleDeliveryPosition(bot, chatId, callbackQuery).then(() => {
+    await handleDeliveryName(bot, chatId, callbackQuery).then(() => {
       bot.answerCallbackQuery(callbackQuery.id);
     });
   });
 }
 
-const handleDeliveryPosition = async (bot, chatId, callbackQuery) => {
+const handleDeliveryName = async (bot, chatId, callbackQuery) => {
   const data = callbackQuery.data;
 
   if (data.startsWith('delivery_')) {
-    const deliveryPosition = data.split('_')[1];
+    const deliveryName = data.split('_')[1];
     const delivery = await Delivery.findOne({
-      where: { position: deliveryPosition },
+      where: { deliveryName },
     });
 
     if (delivery) {
       bot.sendMessage(
         chatId,
-        `Вы выбрали доставку в ${delivery.position}. Остались вопросы?`
+        `Вы выбрали доставку в ${delivery.deliveryName}. Остались вопросы?`
       );
 
       return;
     }
 
-    if (!delivery && deliveryPosition === 'Вернуться назад') {
+    if (!delivery && deliveryName === 'Назад') {
       showDeliveryMenu(bot, chatId);
 
       return;
     } else {
       bot.sendMessage(
         chatId,
-        `Ошибка: не удалось найти доставку для ${deliveryPosition}`
+        `Ошибка: не удалось найти доставку для ${deliveryName}`
       );
     }
   } else if (data === 'back_to_start') {
     await showStartMenu(bot, chatId);
   }
 };
-
-// // Функция для создания клавиатуры с позициями доставки
-// const createKeyboard = (positions) => {
-//   const keyboard = [];
-
-//   while (positions.length) {
-//     const row = positions.splice(0, 3);
-//     keyboard.push(
-//       row.map((delivery) => ({
-//         text: String(delivery.position),
-//         callback_data: `delivery_${delivery.position}`,
-//       }))
-//     );
-//   }
-
-//   return keyboard;
-// };
 
 // Обработчик для выбора роли в стартовом меню
 const handleStartMenu = async (bot, callbackQuery) => {

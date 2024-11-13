@@ -7,7 +7,7 @@ async function handleAddDelivery(bot, msg) {
 
   try {
     const delivery = await Delivery.create({
-      position: msg.text,
+      deliveryName: msg.text,
       supplierId: id,
     });
 

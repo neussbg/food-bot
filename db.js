@@ -42,7 +42,7 @@ const Supplier = sequelize.define('Supplier', {
 
 // Модель доставок
 const Delivery = sequelize.define('Delivery', {
-  position: {
+  deliveryName: {
     type: DataTypes.STRING,
     allowNull: false,
   },

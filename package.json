@@ -1,10 +1,12 @@
 {
   "scripts": {
+    "install": "npm i nodemon",
     "start": "nodemon main.js",
     "format": "prettier --write ."
   },
   "dependencies": {
     "node-telegram-bot-api": "^0.66.0",
+    "nodemon": "^3.1.7",
     "prettier": "^3.3.3",
     "sequelize": "^6.37.5",
     "sqlite3": "^5.1.7"
