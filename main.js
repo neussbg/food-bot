@@ -1,5 +1,5 @@
-const startServer = require('./main/server');
-const bot = require('./main/bot');
+const startServer = require('./core/server');
+const bot = require('./core/bot');
 
 // Запуск сервера и бота
 startServer();

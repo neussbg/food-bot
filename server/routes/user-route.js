@@ -1,5 +1,5 @@
 const express = require('express');
-const { User } = require('../db');
+const { User } = require('../../db');
 const router = express.Router();
 
 // Получение всех пользователей

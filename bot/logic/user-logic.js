@@ -1,5 +1,5 @@
-const { addUser } = require('../api/user-api');
-const { User } = require('../db');
+const { addUser } = require('../../server/controllers/user-controller');
+const { User } = require('../../db');
 
 async function createUser(bot, callbackQuery, role) {
   const chatId = callbackQuery.message.chat.id;

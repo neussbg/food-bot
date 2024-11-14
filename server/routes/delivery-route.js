@@ -1,5 +1,5 @@
 const express = require('express');
-const { Delivery, Op } = require('../db');
+const { Delivery, Op } = require('../../db');
 const router = express.Router();
 
 // Получение всех доставок
@@ -62,7 +62,7 @@ router.get('/search', async (req, res) => {
       },
     });
 
-    if (delivery.length === 0) {
+    if (!delivery || delivery?.length === 0) {
       return res.status(404).json({ error: 'Доставка не найдена' });
     }
 

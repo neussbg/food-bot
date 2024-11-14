@@ -1,16 +1,13 @@
-const { getUserById } = require('../api/user-api');
-const { createUser, getUser } = require('../logic/crud-user');
+const { getUserById } = require('../../server/controllers/user-controller');
+const { createUser } = require('../logic/user-logic');
 
 async function login(bot, callbackQuery) {
-  const chatId = callbackQuery.message.chat.id;
-  const { first_name } = callbackQuery.from;
   const { data } = callbackQuery;
 
   const seller = 'send_orders';
   const customer = 'receive_orders';
 
   try {
-    const chatId = callbackQuery.message.chat.id;
     const { id } = callbackQuery.from;
 
     const user = await getUserById(id);

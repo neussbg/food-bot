@@ -1,5 +1,5 @@
 const { login } = require('../auth/auth');
-const { u, updateUserRole } = require('../logic/crud-user');
+const { u, updateUserRole } = require('../logic/user-logic');
 
 const {
   sellerKeyboard,
@@ -12,8 +12,10 @@ const {
 const {
   handleAddDelivery,
   handleGetAllDelivery,
-} = require('../logic/crud-delivery');
-const { getDeliveryByName } = require('../api/delivery-api');
+} = require('../logic/delivery-logic');
+const {
+  getDeliveryByName,
+} = require('../../server/controllers/delivery-controller');
 
 const showDeliveryMenu = (bot, chatId) => {
   bot.sendMessage(

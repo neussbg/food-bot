@@ -1,8 +1,10 @@
 // db.js
 const { Sequelize, DataTypes, Op } = require('sequelize');
+const path = require('path');
+
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: './database.sqlite',
+  storage: path.join(__dirname, 'database', 'database.sqlite'),
 });
 
 const Company = sequelize.define('Company', {

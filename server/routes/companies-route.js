@@ -1,5 +1,5 @@
 const express = require('express');
-const { Company } = require('../db'); // Импорт модели Company
+const { Company } = require('../../db'); // Импорт модели Company
 const router = express.Router();
 
 // Получение всех компаний

@@ -1,5 +1,7 @@
-const { addDelivery } = require('../api/delivery-api');
-const { Delivery } = require('../db');
+const {
+  addDelivery,
+  getDeliveries,
+} = require('../../server/controllers/delivery-controller');
 
 async function handleAddDelivery(bot, msg) {
   const chatId = msg.chat.id;
@@ -35,9 +37,9 @@ async function handlePostDelivery(params) {}
 
 async function handleGetAllDelivery() {
   try {
-    const delivery = await Delivery.findAll();
+    const deliveries = await getDeliveries();
 
-    return delivery;
+    return deliveries;
   } catch {
     console.error('Ошибка создания доставки');
 

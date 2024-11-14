@@ -1,5 +1,9 @@
 const { showStartMenu } = require('./menu');
-const { addUser, getUserById, getUsers } = require('../api/user-api');
+const {
+  addUser,
+  getUserById,
+  getUsers,
+} = require('../../server/controllers/user-controller');
 
 // Инициализация команды /start
 module.exports.initStartCommand = (bot) => {

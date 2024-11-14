@@ -1,14 +1,16 @@
 // server.js
 const express = require('express');
+require('dotenv').config();
+
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT;
 
 app.use(express.json()); // Middleware для обработки JSON
 
 // Подключение файлов с маршрутами
-const companyRoutes = require('../routes/companies');
-const userRoutes = require('../routes/user');
-const deliveryRoutes = require('../routes/delivery');
+const companyRoutes = require('../server/routes/companies-route');
+const userRoutes = require('../server/routes/user-route');
+const deliveryRoutes = require('../server/routes/delivery-route');
 
 // Главная страница
 app.get('/', (req, res) => {

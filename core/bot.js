@@ -1,6 +1,6 @@
-const { initStartCommand } = require('../commands/start');
+const { initStartCommand } = require('../bot/commands/start');
 
-require('dotenv').config(); // Загружаем переменные из .env файла
+require('dotenv').config();
 
 const TelegramBot = require('node-telegram-bot-api');
 
