@@ -1,17 +1,14 @@
+const { addUser } = require('../api/user-api');
 const { User } = require('../db');
 
-async function createUser(bot, callbackQuery) {
+async function createUser(bot, callbackQuery, role) {
   const chatId = callbackQuery.message.chat.id;
   const { id, first_name } = callbackQuery.from;
 
   try {
     // Создаем нового пользователя в базе данных
-    await User.create({
-      chatId: chatId,
-      id: Number(id),
-      name: first_name,
-      role: 'seller',
-    });
+
+    await addUser(chatId, first_name, role);
 
     // Сообщение о успешной регистрации после создания
     await bot.sendMessage(
@@ -27,16 +24,13 @@ async function createUser(bot, callbackQuery) {
   }
 }
 
-async function getUser(callbackQuery) {
-  const chatId = callbackQuery.message.chat.id;
-  const { id } = callbackQuery.from;
+// async function getUser(chatId, id) {
+//   const user = await User.findOne({
+//     where: { chatId: chatId.toString(), id: Number(id) },
+//   });
 
-  const user = await User.findOne({
-    where: { chatId: chatId.toString(), id: Number(id) },
-  });
-
-  return user;
-}
+//   return user;
+// }
 
 async function updateUserRole(bot, callbackQuery, newRole) {
   const chatId = callbackQuery.message.chat.id;
@@ -74,4 +68,5 @@ async function updateUserRole(bot, callbackQuery, newRole) {
     return false;
   }
 }
-module.exports = { createUser, getUser, updateUserRole };
+
+module.exports = { createUser, updateUserRole };

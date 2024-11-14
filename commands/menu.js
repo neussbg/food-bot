@@ -1,6 +1,5 @@
 const { login } = require('../auth/auth');
 const { u, updateUserRole } = require('../logic/crud-user');
-const { Delivery } = require('../db');
 
 const {
   sellerKeyboard,
@@ -14,6 +13,7 @@ const {
   handleAddDelivery,
   handleGetAllDelivery,
 } = require('../logic/crud-delivery');
+const { getDeliveryByName } = require('../api/delivery-api');
 
 const showDeliveryMenu = (bot, chatId) => {
   bot.sendMessage(
@@ -111,8 +111,6 @@ const showManageDeliveryMenu = (bot, chatId) => {
   });
 };
 
-const deliveryManagmnent = () => {};
-
 // Главное меню (выбор роли)
 async function showStartMenu(bot, chatId) {
   bot.sendMessage(chatId, 'Выберите действие:', startMenu());
@@ -149,9 +147,8 @@ const handleDeliveryName = async (bot, chatId, callbackQuery) => {
 
   if (data.startsWith('delivery_')) {
     const deliveryName = data.split('_')[1];
-    const delivery = await Delivery.findOne({
-      where: { deliveryName },
-    });
+
+    const delivery = await getDeliveryByName(deliveryName);
 
     if (delivery) {
       bot.sendMessage(

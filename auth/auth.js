@@ -1,3 +1,4 @@
+const { getUserById } = require('../api/user-api');
 const { createUser, getUser } = require('../logic/crud-user');
 
 async function login(bot, callbackQuery) {
@@ -9,7 +10,10 @@ async function login(bot, callbackQuery) {
   const customer = 'receive_orders';
 
   try {
-    const user = await getUser(callbackQuery);
+    const chatId = callbackQuery.message.chat.id;
+    const { id } = callbackQuery.from;
+
+    const user = await getUserById(id);
 
     if (data === seller) {
       return await sellerUser(bot, user, callbackQuery);
@@ -50,7 +54,7 @@ async function sellerUser(bot, user, callbackQuery) {
       );
 
       // Создаем нового пользователя в базе данных
-      return await createUser(bot, callbackQuery);
+      return await createUser(bot, callbackQuery, 'seller');
     }
   } catch (error) {
     console.error('Ошибка идентификации пользователя', error);

@@ -1,3 +1,4 @@
+const { addDelivery } = require('../api/delivery-api');
 const { Delivery } = require('../db');
 
 async function handleAddDelivery(bot, msg) {
@@ -6,10 +7,7 @@ async function handleAddDelivery(bot, msg) {
   const { id, first_name } = msg.from;
 
   try {
-    const delivery = await Delivery.create({
-      deliveryName: msg.text,
-      supplierId: id,
-    });
+    const createDelivery = await addDelivery(msg.text, id);
 
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -18,7 +16,7 @@ async function handleAddDelivery(bot, msg) {
           `Доставка ${msg.text} была добавлена, ${first_name} теперь является поставщиком`
         );
 
-        resolve(delivery);
+        resolve(createDelivery);
       }, 200);
     });
   } catch (error) {

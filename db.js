@@ -1,34 +1,25 @@
 // db.js
-const { Sequelize, DataTypes } = require('sequelize');
+const { Sequelize, DataTypes, Op } = require('sequelize');
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: './database.sqlite',
 });
 
-// Модель пользователя
-const User = sequelize.define('User', {
-  chatId: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
+const Company = sequelize.define('Company', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true, // Автоинкремент для автоматической генерации ID
   },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
-  },
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true, // Указание, что это первичный ключ
-    autoIncrement: true, // Автоинкремент для генерации уникальных значений
-  },
-  role: {
-    type: DataTypes.ENUM('customer', 'seller'),
-    allowNull: false,
+    unique: true,
   },
 });
 
-// Модель Поставщика
-const Supplier = sequelize.define('Supplier', {
+// Модель пользователя
+const User = sequelize.define('User', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -36,6 +27,10 @@ const Supplier = sequelize.define('Supplier', {
   },
   name: {
     type: DataTypes.STRING,
+    allowNull: false,
+  },
+  role: {
+    type: DataTypes.ENUM('customer', 'seller'),
     allowNull: false,
   },
 });
@@ -56,37 +51,15 @@ const Delivery = sequelize.define('Delivery', {
   },
 });
 
-// Модель заказа
-const Order = sequelize.define('Order', {
-  items: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  amount: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-});
-
 // Связь между пользователями и заказами
 
-// User.hasMany(Order)
-// Order.belongsTo(User)
-// User.hasMany(Order);
-// Order.belongsTo(User);
+// User.belongsTo(Company, { foreignKey: 'companyId' }); // Связываем пользователя с компанией
+// Company.hasMany(User, { foreignKey: 'companyId' }); // Компания может иметь множество пользователей
 User.hasMany(Delivery);
 Delivery.belongsTo(User);
 
 // Синхронизируем модели с базой данных
 
 sequelize.sync();
-// sequelize
-//   .sync({ force: true })
-//   .then(() => {
-//     console.log('Таблицы синхронизированы');
-//   })
-//   .catch((error) => {
-//     console.error('Ошибка при синхронизации таблиц:', error);
-//   });
 
-module.exports = { sequelize, User, Order, Delivery, Supplier };
+module.exports = { sequelize, Op, User, Delivery, Company };
